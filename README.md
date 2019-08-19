@@ -4,13 +4,13 @@ A simple Go error utility to record the error stack trace, which supports custom
 
 # How to
 
-Replace import paths of package errors:
+Replace import paths of default package errors by:
 
 ```
 import "github.com/IguteChung/go-errors"
 ```
 
-Replace all the occurences of `fmt.Errorf`
+Replace all the occurences of `fmt.Errorf` by:
 
 ```
 errors.Errorf("something wrong: %v", err)
@@ -18,12 +18,8 @@ errors.Errorf("something wrong: %v", err)
 
 # You are done, let's get the stacktrace
 
-Cast an error to `ErrorTracer` to get the stacktrace.
-
 ```
-if tracer, ok := err.(errors.ErrorTracer); ok {
-    fmt.Println(tracer.Stack().Format(errors.GoLikeFormatter))
-}
+fmt.Println(errors.StackTrace(err))
 ```
 
 ```sh

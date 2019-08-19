@@ -6,9 +6,13 @@ import (
 	"github.com/IguteChung/go-errors"
 )
 
+func init() {
+	errors.ApplyFormatter(errors.GoLikeFormatter)
+}
+
 func main() {
 	err := foo()
-	fmt.Println(err.(errors.ErrorTracer).Stack().Format(errors.GoLikeFormatter))
+	fmt.Println(errors.StackTrace(err))
 }
 
 func foo() error {

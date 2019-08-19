@@ -9,7 +9,7 @@ import (
 
 func TestStackTrace(t *testing.T) {
 	caller := func() {
-		frames := strings.Split(recordStack().Format(""), "\n")
+		frames := strings.Split(recordStack().Format(), "\n")
 		assert.True(t, strings.HasSuffix(frames[0], "stack_test.go:16"))
 	}
 

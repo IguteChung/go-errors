@@ -2,19 +2,19 @@ package errors
 
 import "fmt"
 
-// ErrorTracer indicates a tracable error.
-type ErrorTracer interface {
+// errorTracer indicates a tracable error.
+type errorTracer interface {
 	error
 	// Cause returns original error.
 	Cause() error
 	// Stack returns stack trace of this error.
-	Stack() *Stack
+	Stack() *stack
 }
 
-// tracer implements the basic ErrorTracer.
+// tracer implements the basic errorTracer.
 type tracer struct {
 	err   error
-	stack *Stack
+	stack *stack
 }
 
 func (t tracer) Error() string {
@@ -28,11 +28,20 @@ func (t tracer) Cause() error {
 	return t.err
 }
 
-func (t tracer) Stack() *Stack {
+func (t tracer) Stack() *stack {
 	return t.stack
 }
 
-// New creates an ErrorTracer with error message.
+// StackTrace prints the stack trace with given error by the formatter.
+// If the error is not an errorTracer, empty string is returned.
+func StackTrace(err error) string {
+	if tracer, ok := err.(errorTracer); ok {
+		return tracer.Stack().Format()
+	}
+	return ""
+}
+
+// New creates an errorTracer with error message.
 func New(msg string) error {
 	return tracer{
 		err:   fmt.Errorf(msg),
@@ -40,13 +49,13 @@ func New(msg string) error {
 	}
 }
 
-// Errorf creates an ErrorTracer with formatted message.
-// If args contains an ErrorTracer, apply the stack of it.
-// If args doesn't contain an ErrorTracer, record the stack trace.
+// Errorf creates an errorTracer with formatted message.
+// If args contains an errorTracer, apply the stack of it.
+// If args doesn't contain an errorTracer, record the stack trace.
 func Errorf(msg string, args ...interface{}) error {
 	e := fmt.Errorf(msg, args...)
 	for _, arg := range args {
-		if t, ok := arg.(ErrorTracer); ok {
+		if t, ok := arg.(errorTracer); ok {
 			return tracer{
 				err:   e,
 				stack: t.Stack(),
@@ -59,11 +68,11 @@ func Errorf(msg string, args ...interface{}) error {
 	}
 }
 
-// Wrap wraps an error into an ErrorTracer.
-// If the wrapped error is an ErrorTracer, do nothing.
-// If the wrapped error is not an ErrorTracer, record the stack trace.
+// Wrap wraps an error into an errorTracer.
+// If the wrapped error is an errorTracer, do nothing.
+// If the wrapped error is not an errorTracer, record the stack trace.
 func Wrap(err error) error {
-	if _, ok := err.(ErrorTracer); ok {
+	if _, ok := err.(errorTracer); ok {
 		return err
 	}
 	return tracer{
@@ -72,15 +81,15 @@ func Wrap(err error) error {
 	}
 }
 
-// WrapMessage wraps an error into an ErrorTracer with message.
-// If the wrapped error is an ErrorTracer, only append the error message.
-// If the wrapped error is not an ErrorTracer, record the stack trace.
+// WrapMessage wraps an error into an errorTracer with message.
+// If the wrapped error is an errorTracer, only append the error message.
+// If the wrapped error is not an errorTracer, record the stack trace.
 func WrapMessage(err error, msg string) error {
 	e := fmt.Errorf("%s: %v", msg, err)
-	if ErrorTracer, ok := err.(ErrorTracer); ok {
+	if errorTracer, ok := err.(errorTracer); ok {
 		return tracer{
 			err:   e,
-			stack: ErrorTracer.Stack(),
+			stack: errorTracer.Stack(),
 		}
 	}
 	return tracer{
@@ -89,16 +98,16 @@ func WrapMessage(err error, msg string) error {
 	}
 }
 
-// WrapMessagef wraps an error into an ErrorTracer with formatted message.
-// If the wrapped error is an ErrorTracer, only append the error message.
-// If the wrapped error is not an ErrorTracer, record the stack trace.
+// WrapMessagef wraps an error into an errorTracer with formatted message.
+// If the wrapped error is an errorTracer, only append the error message.
+// If the wrapped error is not an errorTracer, record the stack trace.
 func WrapMessagef(err error, msg string, args ...interface{}) error {
 	formattedMsg := fmt.Sprintf(msg, args...)
 	e := fmt.Errorf("%s: %v", formattedMsg, err)
-	if ErrorTracer, ok := err.(ErrorTracer); ok {
+	if errorTracer, ok := err.(errorTracer); ok {
 		return tracer{
 			err:   e,
-			stack: ErrorTracer.Stack(),
+			stack: errorTracer.Stack(),
 		}
 	}
 	return tracer{
