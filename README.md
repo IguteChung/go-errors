@@ -4,7 +4,7 @@ A simple Go error utility to record the error stack trace, which supports custom
 
 # How to
 
-Replace import paths of default package errors by:
+Replace import paths of `import "errors"` by:
 
 ```
 import "github.com/IguteChung/go-errors"
@@ -22,11 +22,31 @@ errors.Errorf("something wrong: %v", err)
 fmt.Println(errors.StackTrace(err))
 ```
 
-```sh
+Output:
+
+```
+/tmp/sandbox647637562/prog.go:24
+/tmp/sandbox647637562/prog.go:19
+/tmp/sandbox647637562/prog.go:14
+```
+
+# More customization
+
+Apply custom format for stack trace:
+
+```
+func init() {
+	errors.ApplyFormatter("foo\n\tfile.go:152\n")
+}
+```
+
+Output:
+
+```
 main.bar
-	/tmp/sandbox154253539/prog.go:18
+	/tmp/sandbox639852497/prog.go:24
 main.foo
-	/tmp/sandbox154253539/prog.go:14
+	/tmp/sandbox639852497/prog.go:19
 main.main
-	/tmp/sandbox154253539/prog.go:9
+	/tmp/sandbox639852497/prog.go:14
 ```
