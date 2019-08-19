@@ -12,9 +12,9 @@ type Formatter string
 // constants for Stack formatters.
 const (
 	DefaultFormatter    Formatter = "file.go:152\n"
-	JavaLikeFormatter   Formatter = "at foo(file.go:152)\n"
-	GoLikeFormatter     Formatter = "foo\n\tfile.go:152\n"
-	PythonLikeFormatter Formatter = "File file.go, line 152, in foo\n"
+	JavaLikeFormatter             = "at foo(file.go:152)\n"
+	GoLikeFormatter               = "foo\n\tfile.go:152\n"
+	PythonLikeFormatter           = "File file.go, line 152, in foo\n"
 )
 
 var tracerFormatter = DefaultFormatter
